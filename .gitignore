@@ -1,0 +1,5 @@
+node_modules/
+dist/
+.spacetimedb/
+spacetime.json
+spacetime.local.json

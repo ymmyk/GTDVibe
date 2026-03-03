@@ -1,0 +1,8 @@
+{
+  "name": "spacetimedb-module",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "spacetimedb": "^1.11.0"
+  }
+}

@@ -75,4 +75,123 @@ const taskContexts = table(
   }
 );
 
-export default schema(users, tasks, taskLogs, projects, contexts, taskContexts);
+const spacetime = schema(users, tasks, taskLogs, projects, contexts, taskContexts);
+
+const err = (value: string) => ({ tag: "err" as const, value });
+
+spacetime.reducer("create_project", { name: t.string() }, (ctx, { name }) => {
+  ctx.db.projects.insert({
+    userId: ctx.sender,
+    name,
+    createdAt: ctx.timestamp,
+  });
+});
+
+spacetime.reducer(
+  "update_project",
+  { id: t.u64(), name: t.string() },
+  (ctx, { id, name }) => {
+    const project = ctx.db.projects.id.find(id);
+    if (!project || project.userId !== ctx.sender) {
+      return err("project not found");
+    }
+
+    ctx.db.projects.delete(project);
+    ctx.db.projects.insert({ ...project, name });
+  }
+);
+
+spacetime.reducer("delete_project", { id: t.u64() }, (ctx, { id }) => {
+  const project = ctx.db.projects.id.find(id);
+  if (!project || project.userId !== ctx.sender) {
+    return err("project not found");
+  }
+
+  ctx.db.projects.delete(project);
+});
+
+spacetime.reducer("create_context", { name: t.string() }, (ctx, { name }) => {
+  ctx.db.contexts.insert({
+    userId: ctx.sender,
+    name,
+    createdAt: ctx.timestamp,
+  });
+});
+
+spacetime.reducer(
+  "update_context",
+  { id: t.u64(), name: t.string() },
+  (ctx, { id, name }) => {
+    const context = ctx.db.contexts.id.find(id);
+    if (!context || context.userId !== ctx.sender) {
+      return err("context not found");
+    }
+
+    ctx.db.contexts.delete(context);
+    ctx.db.contexts.insert({ ...context, name });
+  }
+);
+
+spacetime.reducer("delete_context", { id: t.u64() }, (ctx, { id }) => {
+  const context = ctx.db.contexts.id.find(id);
+  if (!context || context.userId !== ctx.sender) {
+    return err("context not found");
+  }
+
+  for (const link of ctx.db.taskContexts.iter()) {
+    if (link.contextId === id) {
+      ctx.db.taskContexts.delete(link);
+    }
+  }
+
+  ctx.db.contexts.delete(context);
+});
+
+spacetime.reducer(
+  "assign_context_to_task",
+  { taskId: t.u64(), contextId: t.u64() },
+  (ctx, { taskId, contextId }) => {
+    const task = ctx.db.tasks.id.find(taskId);
+    if (!task || task.userId !== ctx.sender) {
+      return err("task not found");
+    }
+
+    const context = ctx.db.contexts.id.find(contextId);
+    if (!context || context.userId !== ctx.sender) {
+      return err("context not found");
+    }
+
+    for (const link of ctx.db.taskContexts.iter()) {
+      if (link.taskId === taskId && link.contextId === contextId) {
+        return;
+      }
+    }
+
+    ctx.db.taskContexts.insert({ taskId, contextId });
+  }
+);
+
+spacetime.reducer(
+  "remove_context_from_task",
+  { taskId: t.u64(), contextId: t.u64() },
+  (ctx, { taskId, contextId }) => {
+    const task = ctx.db.tasks.id.find(taskId);
+    if (!task || task.userId !== ctx.sender) {
+      return err("task not found");
+    }
+
+    const context = ctx.db.contexts.id.find(contextId);
+    if (!context || context.userId !== ctx.sender) {
+      return err("context not found");
+    }
+
+    for (const link of ctx.db.taskContexts.iter()) {
+      if (link.taskId === taskId && link.contextId === contextId) {
+        ctx.db.taskContexts.delete(link);
+        return;
+      }
+    }
+  }
+);
+
+export default spacetime;

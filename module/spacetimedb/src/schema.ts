@@ -18,7 +18,7 @@ const tasks = table(
     notes: t.string().optional(),
     status: t.string().index("btree"),
     priority: t.string(),
-    projectId: t.u64().optional().index("btree"),
+    projectId: t.u64().optional(),
     dueDate: t.timestamp().optional(),
     parentTaskId: t.u64().optional(),
     createdAt: t.timestamp(),

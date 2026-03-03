@@ -75,4 +75,54 @@ const taskContexts = table(
   }
 );
 
-export default schema(users, tasks, taskLogs, projects, contexts, taskContexts);
+const spacetime = schema(users, tasks, taskLogs, projects, contexts, taskContexts);
+
+spacetime.reducer(
+  "append_log",
+  {
+    taskId: t.u64(),
+    message: t.string(),
+  },
+  (ctx, { taskId, message }) => {
+    const task = ctx.db.tasks.id.find(taskId);
+    if (!task) {
+      throw new Error("Task not found");
+    }
+
+    if (!task.userId.equals(ctx.sender)) {
+      throw new Error("Unauthorized");
+    }
+
+    ctx.db.taskLogs.insert({
+      taskId,
+      message,
+      createdAt: ctx.timestamp,
+    });
+  }
+);
+
+spacetime.reducer(
+  "system_log",
+  {
+    taskId: t.u64(),
+    message: t.string(),
+  },
+  (ctx, { taskId, message }) => {
+    if (!ctx.senderAuth.isInternal) {
+      throw new Error("Only internal reducers can call system_log");
+    }
+
+    const task = ctx.db.tasks.id.find(taskId);
+    if (!task) {
+      throw new Error("Task not found");
+    }
+
+    ctx.db.taskLogs.insert({
+      taskId,
+      message,
+      createdAt: ctx.timestamp,
+    });
+  }
+);
+
+export default spacetime;

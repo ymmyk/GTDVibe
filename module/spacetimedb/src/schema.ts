@@ -69,6 +69,7 @@ const taskContexts = table(
     ],
   },
   {
+    id: t.u64().autoInc().primaryKey(),
     taskId: t.u64().index("btree"),
     contextId: t.u64(),
   }

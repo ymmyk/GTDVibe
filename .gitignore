@@ -3,3 +3,4 @@ dist/
 .spacetimedb/
 spacetime.json
 spacetime.local.json
+.DS_Store

@@ -1,1 +1,8 @@
-{}
+{
+  "name": "2-monorepo-scaffolding",
+  "private": true,
+  "workspaces": [
+    "module/spacetimedb",
+    "app"
+  ]
+}

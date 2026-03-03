@@ -77,6 +77,27 @@ const taskContexts = table(
 
 const spacetime = schema(users, tasks, taskLogs, projects, contexts, taskContexts);
 
+const insertTaskLog = (ctx: any, taskId: bigint, message: string) => {
+  ctx.db.taskLogs.insert({
+    taskId,
+    message,
+    createdAt: ctx.timestamp,
+  });
+};
+
+const system_log = (
+  ctx: any,
+  taskId: bigint,
+  previousStatus: string,
+  nextStatus: string
+) => {
+  if (previousStatus === nextStatus) {
+    return;
+  }
+
+  insertTaskLog(ctx, taskId, `Status changed from ${previousStatus} to ${nextStatus}`);
+};
+
 spacetime.reducer(
   "append_log",
   {
@@ -93,35 +114,34 @@ spacetime.reducer(
       throw new Error("Unauthorized");
     }
 
-    ctx.db.taskLogs.insert({
-      taskId,
-      message,
-      createdAt: ctx.timestamp,
-    });
+    insertTaskLog(ctx, taskId, message);
   }
 );
 
 spacetime.reducer(
-  "system_log",
+  "set_task_status",
   {
     taskId: t.u64(),
-    message: t.string(),
+    status: t.string(),
   },
-  (ctx, { taskId, message }) => {
-    if (!ctx.senderAuth.isInternal) {
-      throw new Error("Only internal reducers can call system_log");
-    }
-
+  (ctx, { taskId, status }) => {
     const task = ctx.db.tasks.id.find(taskId);
     if (!task) {
       throw new Error("Task not found");
     }
 
-    ctx.db.taskLogs.insert({
-      taskId,
-      message,
-      createdAt: ctx.timestamp,
+    if (!task.userId.equals(ctx.sender)) {
+      throw new Error("Unauthorized");
+    }
+
+    ctx.db.tasks.delete(task);
+    ctx.db.tasks.insert({
+      ...task,
+      status,
+      updatedAt: ctx.timestamp,
     });
+
+    system_log(ctx, taskId, task.status, status);
   }
 );
 

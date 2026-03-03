@@ -6,6 +6,9 @@ default:
 install:
   pnpm install
 
+dev:
+  pnpm dev
+
 build:
   pnpm -r build
 

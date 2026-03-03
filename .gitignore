@@ -6,3 +6,5 @@ spacetime.local.json
 .pnpm-store/
 *.log
 .DS_Store
+.env
+.env.local

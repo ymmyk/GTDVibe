@@ -79,6 +79,73 @@ const spacetime = schema(users, tasks, taskLogs, projects, contexts, taskContext
 
 const err = (value: string) => ({ tag: "err" as const, value });
 
+const system_log = (ctx: any, taskId: bigint, message: string) => {
+  ctx.db.taskLogs.insert({
+    taskId,
+    message,
+    createdAt: ctx.timestamp,
+  });
+};
+
+const logStatusChange = (
+  ctx: any,
+  taskId: bigint,
+  previousStatus: string,
+  nextStatus: string
+) => {
+  if (previousStatus === nextStatus) {
+    return;
+  }
+
+  system_log(
+    ctx,
+    taskId,
+    `Status changed from ${previousStatus} to ${nextStatus}`
+  );
+};
+
+const findTaskForSender = (ctx: any, taskId: bigint) => {
+  const task = ctx.db.tasks.id.find(taskId);
+  if (!task || task.userId !== ctx.sender) {
+    return null;
+  }
+
+  return task;
+};
+
+spacetime.reducer(
+  "append_log",
+  { taskId: t.u64(), message: t.string() },
+  (ctx, { taskId, message }) => {
+    const task = findTaskForSender(ctx, taskId);
+    if (!task) {
+      return err("task not found");
+    }
+
+    system_log(ctx, taskId, message);
+  }
+);
+
+spacetime.reducer(
+  "set_task_status",
+  { taskId: t.u64(), status: t.string() },
+  (ctx, { taskId, status }) => {
+    const task = findTaskForSender(ctx, taskId);
+    if (!task) {
+      return err("task not found");
+    }
+
+    ctx.db.tasks.delete(task);
+    ctx.db.tasks.insert({
+      ...task,
+      status,
+      updatedAt: ctx.timestamp,
+    });
+
+    logStatusChange(ctx, taskId, task.status, status);
+  }
+);
+
 spacetime.reducer("create_project", { name: t.string() }, (ctx, { name }) => {
   ctx.db.projects.insert({
     userId: ctx.sender,

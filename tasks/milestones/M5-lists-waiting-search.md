@@ -1,0 +1,68 @@
+# M5 — Lists, Waiting, Search, Home
+
+**Goal:** All remaining screens functional. Full-text search finds items by log content.
+
+**Exit criterion:** Search "Dr. Kwan" returns the item whose only mention is in a log entry body.
+
+## Tasks
+
+### Home / Today (`app/page.tsx`)
+- [ ] Pinned section: urgent/high priority active items (sorted by priority desc, then updated_at)
+- [ ] Inbox count badge → links `/inbox`
+- [ ] Waiting count badge → links `/waiting`
+- [ ] "Recently updated" feed: items with any log in last 24h, newest activity first
+- [ ] Each row navigates to item detail
+- [ ] Quick capture bar still present at bottom
+
+### Lists (`app/lists/page.tsx`)
+- [ ] Filter chips: area (multi), owner (multi), status (multi), priority (multi)
+- [ ] Filters encode to URL query params (shareable, back-button-friendly)
+- [ ] Group-by toggle: none / area / owner / status
+- [ ] Sort-by toggle: updated / created / priority / due_date
+- [ ] Quick-add at top of each group respects group filter (pre-fills area/owner if grouped)
+- [ ] Empty state per group
+- [ ] Infinite scroll if > 100 items (paginated query)
+
+### Waiting (`app/waiting/page.tsx`)
+- [ ] Reactive query `items.waiting()`
+- [ ] Each row: title, owner avatar, `waiting_for` text, days waiting badge (red if >14 days, amber if >7)
+- [ ] Prominent "Mark unblocked" button per row (no need to navigate into item)
+- [ ] Sort by days waiting desc by default
+
+### Search (`app/search/page.tsx`)
+- [ ] Convex full-text indexes on `items.title`, `items.body`, `item_logs.body`
+- [ ] Query: `search.global(q)` — returns unified results
+- [ ] Result card: item title + most relevant snippet (log body if log matched, else item body)
+- [ ] Snippet highlights match term
+- [ ] Filter chips: area, owner, status, date range
+- [ ] Keyboard shortcut `/` focuses search from anywhere
+
+### Areas settings (`app/settings/areas/page.tsx`)
+- [ ] List household areas
+- [ ] Create new area — name + emoji picker + color picker
+- [ ] Edit inline
+- [ ] Archive area (items are not deleted; tag relations drop or mark area archived and hide)
+- [ ] Reorder via drag (optional, nice-to-have)
+- [ ] Seed default areas on first login: Home, Kids, Finance, Health, Someday/Maybe
+
+### Convex search setup
+- [ ] Schema: add `searchIndex` on items.title, items.body
+- [ ] Schema: add `searchIndex` on item_logs.body with `filterField: item_id`
+- [ ] Unified query: two search calls, merge + dedupe by item_id, rank by match score
+
+### Tests
+- [ ] Playwright: create item, add log with "Dr. Kwan" in body only, search finds it
+- [ ] Playwright: filter list by area + owner, verify URL params
+- [ ] Playwright: waiting view shows correct days_waiting
+- [ ] Playwright: home page reactive count badges update across tabs
+
+## Verification
+- All 7 screens from the megaprompt exist and work
+- Default areas seeded for new household
+- Search latency < 200ms for household with 500 items
+
+## Out of scope
+- Saved filter presets
+- Global keyboard command palette (v2)
+- Full calendar view (explicitly out per megaprompt)
+- Advanced boolean search operators

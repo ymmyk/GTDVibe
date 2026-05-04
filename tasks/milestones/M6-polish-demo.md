@@ -37,6 +37,14 @@
 - [ ] Lists empty per filter combo
 - [ ] Search empty: helpful prompt
 - [ ] Home empty: CTA to capture first item
+- [ ] One small SVG illustration per empty state (inbox, waiting, search) — see [docs/competitive/ticktick-teardown.md](../../docs/competitive/ticktick-teardown.md) "their visual polish"
+
+### Design tokens (closing the polish gap, see [docs/competitive/ticktick-teardown.md](../../docs/competitive/ticktick-teardown.md))
+- [ ] `packages/ui/src/tokens.css`: `--radius: 0.375rem`, single accent color, gray scale carries the work, no rainbow priority chips (use weight + a single accent dot)
+- [ ] Inter Variable (or system font stack), body line-height 1.4, heading 1.2
+- [ ] Card / row padding 12–16px (override shadcn 24px default)
+- [ ] Row hover transition: `background 80ms ease`, no scale/shadow flair
+- [ ] One typography scale across the app — audit any one-off font sizes and remove
 
 ### Loading & error states
 - [ ] Skeleton loaders for every reactive query list
@@ -63,6 +71,7 @@
 - [ ] Installable on iOS Safari and Android Chrome
 - [ ] Share target intent for Android: receive shared text → pre-fill capture bar
 - [ ] Offline: cached shell loads even when disconnected (data view shows stale + banner)
+- [ ] **Tray-style global capture** (TickTick parity, see [docs/competitive/ticktick-teardown.md](../../docs/competitive/ticktick-teardown.md) #4): installed PWA registers `Ctrl+Shift+Space` (or platform equivalent) via Launch Handler API + Window Controls Overlay where supported; opens a minimal capture window even when the main app is backgrounded. Graceful fallback: same shortcut works in-app only on browsers that don't support the API. A native shell wrapper is explicitly out of scope.
 
 ### Demo seed data
 - [ ] `just seed` creates a rich demo household:

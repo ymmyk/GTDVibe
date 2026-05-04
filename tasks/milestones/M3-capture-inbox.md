@@ -40,6 +40,13 @@
 - [ ] `ConvexReactClient` wired with optimistic updates for `createItem`, `archiveItem`
 - [ ] Loading skeletons for reactive queries (use shadcn Skeleton)
 
+### Smart capture parser (stretch — TickTick parity, see [docs/competitive/ticktick-teardown.md](../../docs/competitive/ticktick-teardown.md) #1)
+- [ ] `packages/shared/src/capture/parse.ts` — `parseCaptureInput(raw: string): { title, due_date?, area_hint?, owner_hint? }`
+- [ ] Grammar: `#area`, `@owner`, `chrono-node` for natural-language dates ("tomorrow 2pm", "next monday")
+- [ ] Returned hints are **suggestions**, not commits — UI renders parsed chips inline; user can press Backspace to drop a chip
+- [ ] Same parser is invoked by the M4.5 `capture_item` MCP tool when args come in as a single `raw` string; structured args bypass it
+- [ ] Vitest: 20+ parser cases covering ambiguous dates, multiple areas, escaped `#`/`@`, empty title after parse
+
 ### Gestures
 - [ ] `@use-gesture/react` or Framer Motion drag for row swipes
 - [ ] Reduced-motion fallback: action buttons revealed via row tap

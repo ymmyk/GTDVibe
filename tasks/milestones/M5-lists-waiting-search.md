@@ -11,6 +11,7 @@
 
 ### Home / Today (`app/page.tsx`)
 - [ ] Pinned section: urgent/high priority active items (sorted by priority desc, then updated_at)
+- [ ] **"Today" lens section** (TickTick parity, see [docs/competitive/ticktick-teardown.md](../../docs/competitive/ticktick-teardown.md) #3) — saved filter `status in (active, waiting) AND (due_date <= today OR has_log_in_24h)`. Section on home, not a separate route. Empty state: "Nothing on today's plate."
 - [ ] Inbox count badge → links `/inbox`
 - [ ] Waiting count badge → links `/waiting`
 - [ ] "Recently updated" feed: items with any log in last 24h, newest activity first
@@ -22,6 +23,7 @@
 - [ ] Filters encode to URL query params (shareable, back-button-friendly)
 - [ ] Group-by toggle: none / area / owner / status / actor
 - [ ] Sort-by toggle: updated / created / priority / due_date
+- [ ] **Density toggle** (TickTick parity, see [docs/competitive/ticktick-teardown.md](../../docs/competitive/ticktick-teardown.md) #2): `comfortable` (56px rows, default) / `compact` (40px rows). Persisted in localStorage, also accepts `?density=compact` URL param.
 - [ ] Quick-add at top of each group respects group filter (pre-fills area/owner if grouped)
 - [ ] Empty state per group
 - [ ] Infinite scroll if > 100 items (paginated query)

@@ -11,6 +11,7 @@ Read these in order before making non-trivial changes:
 2. The milestone file(s) for the work you are doing in [tasks/milestones](tasks/milestones)
 3. [AGENTS.md](AGENTS.md)
 4. Relevant concept docs in [docs/concepts](docs/concepts) only if you need background on product direction or tradeoffs
+5. [docs/competitive/ticktick-teardown.md](docs/competitive/ticktick-teardown.md) when working on capture, list density, home/today views, or visual polish
 
 ## Source Hierarchy
 

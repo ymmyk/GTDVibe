@@ -1,8 +1,8 @@
 # M4 — Item Detail + Activity Log
 
-**Goal:** Full item page with inline editing, log stream, sub-items, and state machine-aware status controls.
+**Goal:** Full item page with inline editing, log stream, sub-items, and state machine-aware status controls. Activity log treats agent actions as first-class — distinct visual treatment, agent name + tool name surfaced, but rendered in the same chronological stream as humans.
 
-**Exit criterion:** Manual walkthrough — create "Bathroom Remodel" with 3 children, add logs to parent and children, cannot complete parent without confirmation warning. All state transitions respect state machine.
+**Exit criterion:** Manual walkthrough — create "Bathroom Remodel" with 3 children, add logs to parent and children, cannot complete parent without confirmation warning. All state transitions respect state machine. A log entry inserted with `actor_kind='agent'` (via direct mutation in test) renders with an agent badge and agent display name.
 
 ## Tasks
 
@@ -34,7 +34,8 @@
 - [ ] Reverse chronological stream
 - [ ] Grouped by day ("Today", "Yesterday", "Apr 8")
 - [ ] User entries: avatar + display_name + body + relative time
-- [ ] System entries: italic, muted color, icon per event type
+- [ ] **Agent entries** (`log_type='agent'`): bot-glyph avatar + agent display_name + "via {tool_name}" subline + body; subtle accent color/border so agent activity is visually distinct without being noisy; no impersonation of the principal human
+- [ ] System entries: italic, muted color, icon per event type; system logs triggered by an agent show "(by {agent_name})" suffix
 - [ ] Log entry field pinned at bottom of panel
   - Textarea, `Enter` submits, `Shift+Enter` newline
   - Optimistic insert
@@ -62,6 +63,8 @@
 - [ ] Playwright: parent with 3 children → attempt complete → confirmation modal
 - [ ] Playwright: `active → waiting` prompts for waiting_for
 - [ ] Playwright: reassign creates system log visible in stream
+- [ ] Playwright: seed an agent log via direct mutation (test fixture) → log stream renders agent badge, agent name, and "via tool_name" subline
+- [ ] Playwright: a system log triggered by an agent action shows "(by {agent_name})" suffix
 
 ## Verification
 - Bathroom Remodel scenario works end-to-end

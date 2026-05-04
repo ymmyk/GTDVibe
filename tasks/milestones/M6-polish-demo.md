@@ -1,12 +1,12 @@
 # M6 — Polish + Demo E2E
 
-**Goal:** Ship-quality UX. The exact 13-step demo scenario from the megaprompt runs green in Playwright.
+**Goal:** Ship-quality UX. The locked demo scenario runs green: a 13-step UI leg in Playwright **and** a 5-step agent leg via scripted MCP client.
 
-**Exit criterion:** `just ci` green. `just e2e` runs full demo scenario green. Lighthouse PWA score ≥ 90 across performance, accessibility, best-practices, PWA.
+**Exit criterion:** `just ci` green. `just e2e` runs the UI demo green. `just mcp-e2e` runs the agent demo green. Lighthouse PWA score ≥ 90 across performance, accessibility, best-practices, PWA.
 
 ## Tasks
 
-### The demo Playwright test (`e2e/demo-scenario.spec.ts`)
+### The demo Playwright test (`e2e/demo-scenario.spec.ts`) — UI leg
 - [ ] Two browser contexts (Alex and Sam)
 - [ ] Step 1: Alex logs in
 - [ ] Step 2: Alex quick-captures "Follow up on Dr. Kwan email"
@@ -21,6 +21,15 @@
 - [ ] Step 11: Alex marks complete
 - [ ] Step 12: Assert item no longer in active views
 - [ ] Step 13: Alex searches "Dr. Kwan" → item found with log snippet
+
+### The demo MCP client test (`e2e/mcp/agent-leg.spec.ts`) — agent leg
+- [ ] Reads `alex-claude` token from `.secrets/agent-tokens.json`
+- [ ] Spawns the MCP server in stdio (or hits HTTP transport for hosted runs)
+- [ ] Step A1: connect, call `tools/list`, assert allowed tools = `query_items, get_item, log_item, search`
+- [ ] Step A2: call `query_items({ status: 'waiting' })` → returns the seeded Dr. Kwan item (re-seed it as waiting before the agent leg runs)
+- [ ] Step A3: call `log_item({ item_id, body: 'Auto-checked: still waiting on Dr. Kwan' })` → success
+- [ ] Step A4: open Alex and Sam in two Playwright contexts → both see the agent log entry within 1000ms with agent badge + "via log_item" subline
+- [ ] Step A5: call `archive_item` → server rejects with `ToolNotAllowed`; assert no state mutation on the item; assert the rejection itself is recorded server-side
 
 ### Empty states
 - [ ] Inbox empty: "Inbox zero"
@@ -62,17 +71,22 @@
   - Easter dinner checklist
   - Jonas's soccer registration (waiting)
   - "Follow up on Dr. Kwan email" (inbox) — required for the E2E
+  - `alex-claude` and `sam-claude` agents with tokens in `.secrets/agent-tokens.json`
+  - At least one historical agent log entry on the Bathroom Remodel project so screenshots show mixed-actor history out of the box
 
 ### CI
-- [ ] GitHub Action runs `just ci` (unit + typecheck)
+- [ ] GitHub Action runs `just ci` (unit + typecheck + tool-parity check)
 - [ ] Separate Playwright job runs `just e2e` against ephemeral Convex preview deployment
+- [ ] Separate job runs `just mcp-e2e` against the same preview deployment (after seed)
 - [ ] Lighthouse CI as a post-deploy check
 
 ## Verification
-- `just ci` → green
-- `just e2e` → the 13-step demo passes
+- `just ci` → green (incl. tool-parity check)
+- `just e2e` → 13-step UI demo passes
+- `just mcp-e2e` → 5-step agent demo passes
 - Lighthouse all ≥ 90
 - Manual test on real iPhone + Android via local network
+- Manual test: Claude Desktop configured with `alex-claude` token can list tools, query waiting items, append a log; Sam sees the log appear in real time with agent attribution
 
 ## Out of scope
 - Push notifications (v2)

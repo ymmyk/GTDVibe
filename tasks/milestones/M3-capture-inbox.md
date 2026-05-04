@@ -1,6 +1,6 @@
 # M3 — Capture + Inbox
 
-**Goal:** The sacred path works. ≤2-tap capture from anywhere. Inbox triage via swipe. Realtime sync between two browsers in <1s.
+**Goal:** The sacred path works in the GUI. ≤2-tap capture from anywhere. Inbox triage via swipe. Realtime sync between two browsers in <1s. The same `createItem` mutation will be exposed as an MCP `capture_item` tool in M4.5 — keep the mutation signature stable.
 
 **Exit criterion:** Playwright test — Alex captures "Follow up on Dr. Kwan email", Sam sees it in <1s, Sam swipes to clarify and assigns to Alex.
 
@@ -17,7 +17,7 @@
 
 ### Inbox screen (`/inbox`)
 - [ ] Lists items where status=`inbox`, newest first
-- [ ] Each row: title, `created_at` relative time, author avatar
+- [ ] Each row: title, `created_at` relative time, author avatar/badge — render an "agent" badge with agent name when `created_by_kind='agent'` (so users can spot agent captures even before the full M4 attribution UI)
 - [ ] Swipe right → open clarify sheet
 - [ ] Swipe left → archive (with undo toast)
 - [ ] Tap → navigate to item detail (stub ok; real detail in M4)
@@ -60,4 +60,5 @@
 - Item detail page (M4)
 - Activity log UI (M4)
 - Sub-items (M4)
+- MCP tools (M4.5)
 - Search (M5)
